@@ -6,68 +6,88 @@
 file = open("input.txt", "r")
 input_ = file.readlines()
 
-startpoint_x = 1
-startpoint_y = 1
-endpoint_x = len(input_[0]) - 3
-endpoint_y = len(input_) - 2
 
-arr = []
+class Item:
+    def __init__(self, x, y, symbol):
+        self.x = x
+        self.y = y
+        self.symbol = symbol
+
+
+class Board:
+    def __init__(self, w, h):
+        self.board = []
+        self.w = w
+        self.h = h
+
+    def add_item(self, x, y, symbol):
+        item = Item(x, y, symbol)
+        self.board.append(item)
+
+    def print(self):
+        arr = []
+        for _ in range(self.h):
+            temp = []
+            for _ in range(self.w):
+                temp.append(".")
+            arr.append(temp)
+
+        for item in self.board:
+            arr[item.y][item.x] = item.symbol
+
+        print("#" * (self.w + 2))
+        for line in arr:
+            print("#", end="")
+            for chr in line:
+                print(chr, end="")
+            print("#")
+        print("#" * (self.w + 2))
+
+    def calc_move(self):
+        for item in self.board:
+            if item.symbol == "^":
+                if item.y >= 0:
+                    item.y = self.h - 1
+                else:
+                    item.y -= 1
+            if item.symbol == "v":
+                if item.y >= self.h-1:
+                    item.y = 0
+                else:
+                    item.y += 1
+            if item.symbol == ">":
+                if item.x >= self.w-1:
+                    item.x = 0
+                else:
+                    item.x += 1
+            if item.symbol == "<":
+                if item.x <= 0:
+                    item.x = self.w - 1
+                else:
+                    item.x -= 1
+
+
+width = 100
+height = 35
+board = Board(width, height)
+i = 0
+j = 0
 for line in input_:
-    line = line.strip("\n")
-    temp = []
-    for chr in line:
-        temp.append(chr)
-    arr.append(temp)
-
-
-def print_arr():
-    for line in arr:
+    line = line.strip("\n#.")
+    if line != "":
         for chr in line:
-            print(chr, end="")
-        print()
-
-
-def calc_arr():
-    global arr
-    arr_temp = []
-    for i in range(len(arr)):
-        temp = []
-        for j in range(len(arr[0])):
-            temp.append(".")
-        arr_temp.append(temp)
-    for i in range(1, len(arr)-1):
-        for j in range(1, len(arr[0])-1):
-            if arr[i][j] == "^":
-                if arr[i-1][j] == "#":
-                    arr_temp[len(arr)-2][j] = "^"
-                else:
-                    arr_temp[i-1][j] = "^"
-            if arr[i][j] == "v":
-                if arr[i+1][j] == "#":
-                    arr_temp[1][j] = "v"
-                else:
-                    arr_temp[i+1][j] = "v"
-            if arr[i][j] == ">":
-                if arr[i][j+1] == "#":
-                    arr_temp[i][1] = ">"
-                else:
-                    arr_temp[i][j+1] = ">"
-            if arr[i][j] == "<":
-                if arr[i][j-1] == "#":
-                    arr_temp[i][len(arr[0])-2] = "<"
-                else:
-                    arr_temp[i][j-1] = "<"
-    
-    for i in range(1, len(arr)-1):
-        for j in range(1, len(arr[0])-1):
-            arr[i][j] = arr_temp[i][j]
+            if chr != ".":
+                board.add_item(i, j, chr)
+            i += 1
+        i = 0
+        j += 1
 
 
 while True:
-    print_arr()
+    board.print()
     key = input("> ")
-    calc_arr()
-    
+    board.calc_move()
+
 
 print("First Puzzle:")
 
